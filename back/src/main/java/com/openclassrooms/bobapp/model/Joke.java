@@ -16,9 +16,9 @@ public class Joke {
         return joke;
     }
 
-    //public void setJoke(String joke) {
-       // this.joke = joke;
-    //}
+    public void setJoke(String joke) {
+        this.joke = joke;
+    }
 
     public String getResponse() {
         return response;
