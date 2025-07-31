@@ -1,0 +1,115 @@
+name: PR checks
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - run: mvn clean verify jacoco:report
+
+      - name: Upload back-end coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: backend/target/site/jacoco
+
+      - name: Publish JUnit results
+        uses: actions/upload-test-results@v2
+        with:
+          files: "**/target/surefire-reports/*.xml"
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm ci
+
+      - run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+
+      - name: Upload front-end coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: angular-coverage
+          path: frontend/coverage
+
+  sonar-backend:
+    needs: backend-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Download backend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: jacoco-report
+          path: cov-backend
+
+      - name: Run SonarCloud analysis (Backend)
+        uses: sonarsource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACK }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN_BACK }}
+            -Dsonar.sources=backend/src/main/java
+            -Dsonar.tests=backend/src/test/java
+            -Dsonar.java.binaries=backend/target/classes
+            -Dsonar.coverage.jacoco.xmlReportPaths=cov-backend/jacoco.xml
+
+  sonar-frontend:
+    needs: frontend-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download frontend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: angular-coverage
+          path: cov-frontend
+
+      - name: Run SonarCloud analysis (Frontend)
+        uses: sonarsource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_FRONT }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN_FRONT }}
+            -Dsonar.sources=frontend/src/app
+            -Dsonar.tests=frontend/src
+            -Dsonar.javascript.lcov.reportPaths=cov-frontend/lcov.info
+            -Dsonar.exclusions=**/*.spec.ts
