@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: backend/target/site/jacoco
+          path: back/target/site/jacoco
 
 #      - name: Publish JUnit results
 #        uses: actions/upload-test-results@v2
@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: angular-coverage
-          path: frontend/coverage
+          path: front/coverage
 
   sonar-backend:
     needs: backend-tests
