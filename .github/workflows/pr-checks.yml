@@ -1,8 +1,9 @@
 name: PR checks
 
 on:
-  pull_request:
-    branches: ["main"]
+#  pull_request:
+  push:
+    branches: ["mise_en_place_ci_cd"]
 
 permissions:
   checks: write
@@ -14,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: back
     steps:
       - uses: actions/checkout@v4
 
@@ -31,16 +32,16 @@ jobs:
           name: jacoco-report
           path: backend/target/site/jacoco
 
-      - name: Publish JUnit results
-        uses: actions/upload-test-results@v2
-        with:
-          files: "**/target/surefire-reports/*.xml"
+#      - name: Publish JUnit results
+#        uses: actions/upload-test-results@v2
+#        with:
+#          files: "**/target/surefire-reports/*.xml"
 
   frontend-tests:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: front
     steps:
       - uses: actions/checkout@v4
 
