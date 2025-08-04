@@ -31,7 +31,7 @@ jobs:
       - name: Upload back-end coverage
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-report
+          name: jacoco-report     # même nom ici
           path: target/site/jacoco/jacoco.xml
 
   frontend-tests:
@@ -56,7 +56,7 @@ jobs:
       - name: Upload front-end coverage
         uses: actions/upload-artifact@v4
         with:
-          name: angular-coverage
+          name: angular-coverage   # même nom ici
           path: coverage/bobapp/lcov.info
 
   sonar-frontend:
@@ -68,8 +68,8 @@ jobs:
       - name: Download frontend coverage
         uses: actions/download-artifact@v4
         with:
-          name: angular-coverage
-          path: cov-frontend   # <-- dossier de destination
+          name: angular-coverage    # même nom ici
+          path: cov-frontend        # dossier cible
 
       - name: Debug - List downloaded frontend coverage
         run: ls -lh cov-frontend || true
@@ -101,8 +101,8 @@ jobs:
       - name: Download backend coverage
         uses: actions/download-artifact@v4
         with:
-          name: jacoco-report
-          path: cov-backend   # <-- dossier de destination
+          name: jacoco-report      # même nom ici
+          path: cov-backend        # dossier cible
 
       - name: Debug - List downloaded backend coverage
         run: ls -lh cov-backend || true
