@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: target/site/jacoco/jacoco.xml  # Chemin relatif au working-directory = back
+          path: target/site/jacoco/jacoco.xml
 
   frontend-tests:
     runs-on: ubuntu-latest
