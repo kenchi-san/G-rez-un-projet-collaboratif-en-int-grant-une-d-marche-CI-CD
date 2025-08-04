@@ -69,7 +69,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: angular-coverage
-          path: cov-frontend
+          path: coverage/bobapp/lcov.info
 
       - name: Debug - List downloaded frontend coverage
         run: ls -lh cov-frontend || true
@@ -102,7 +102,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: jacoco-report
-          path: cov-backend
+          path: target/site/jacoco/jacoco.xml
 
       - name: Debug - List downloaded backend coverage
         run: ls -lh cov-backend || true
