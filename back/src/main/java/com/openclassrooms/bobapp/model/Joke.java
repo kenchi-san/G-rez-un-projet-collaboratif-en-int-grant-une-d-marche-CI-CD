@@ -11,7 +11,6 @@ public class Joke {
         this.joke = joke;
         this.response = response;
     }
-
     public String getJoke() {
         return joke;
     }
