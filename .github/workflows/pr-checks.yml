@@ -28,10 +28,13 @@ jobs:
       - name: Debug - List jacoco files
         run: ls -lh target/site/jacoco || true
 
+      - name: Check jacoco.xml exists
+        run: test -f target/site/jacoco/jacoco.xml && echo "jacoco.xml found" || (echo "jacoco.xml missing" && exit 1)
+
       - name: Upload back-end coverage
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-report     # même nom ici
+          name: jacoco-report
           path: target/site/jacoco/jacoco.xml
 
   frontend-tests:
@@ -101,8 +104,8 @@ jobs:
       - name: Download backend coverage
         uses: actions/download-artifact@v4
         with:
-          name: jacoco-report      # même nom ici
-          path: cov-backend        # dossier cible
+          name: jacoco-report
+          path: cov-backend
 
       - name: Debug - List downloaded backend coverage
         run: ls -lh cov-backend || true
