@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: back/target/site/jacoco
+          path: back/target/site/jacoco/jacoco.xml # <-- Pointage direct vers le XML
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: angular-coverage
-          path: front/coverage
+          path: front/coverage/lcov.info # <-- Pointage direct vers le lcov
 
   sonar-backend:
     needs: backend-tests
@@ -77,7 +77,7 @@ jobs:
           args: >
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY_BACK }}
             -Dsonar.organization=${{ vars.SONAR_ORG }}
-            -Dsonar.host.url=${{ vars.SONAR_HOST_URL }}
+            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.login=${{ secrets.SONAR_TOKEN_BACK }}
             -Dsonar.sources=back/src/main/java
             -Dsonar.tests=back/src/test/java
@@ -102,7 +102,7 @@ jobs:
           args: >
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY_FRONT }}
             -Dsonar.organization=${{ vars.SONAR_ORG }}
-            -Dsonar.host.url=${{ vars.SONAR_HOST_URL }}
+            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.login=${{ secrets.SONAR_TOKEN_FRONT }}
             -Dsonar.sources=front/src/app
             -Dsonar.tests=front/src
