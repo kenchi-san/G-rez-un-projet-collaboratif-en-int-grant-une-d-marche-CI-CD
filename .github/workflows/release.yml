@@ -19,15 +19,15 @@ jobs:
       - uses: sonarsource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY_BACK }}
-            -Dsonar.organization=${{ vars.SONAR_ORG }}
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACK }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.login=${{ secrets.SONAR_TOKEN_BACK }}
 
       - name: Wait for Quality Gate (Backend)
         uses: sonarsource/sonarcloud-quality-gate-action@v1
         with:
-          projectKey: ${{ vars.SONAR_PROJECT_KEY_BACK }}
+          projectKey: ${{ secrets.SONAR_PROJECT_KEY_BACK }}
           sonarToken: ${{ secrets.SONAR_TOKEN_BACK }}
 
   quality-gate-frontend:
@@ -40,15 +40,15 @@ jobs:
       - uses: sonarsource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY_FRONT }}
-            -Dsonar.organization=${{ vars.SONAR_ORG }}
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_FRONT }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.login=${{ secrets.SONAR_TOKEN_FRONT }}
 
       - name: Wait for Quality Gate (Frontend)
         uses: sonarsource/sonarcloud-quality-gate-action@v1
         with:
-          projectKey: ${{ vars.SONAR_PROJECT_KEY_FRONT }}
+          projectKey: ${{ secrets.SONAR_PROJECT_KEY_FRONT }}
           sonarToken: ${{ secrets.SONAR_TOKEN_FRONT }}
 
   build-and-push:
