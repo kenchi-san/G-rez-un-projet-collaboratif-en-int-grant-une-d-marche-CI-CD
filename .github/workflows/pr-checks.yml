@@ -25,11 +25,16 @@ jobs:
 
       - run: mvn clean verify jacoco:report
 
+      # Vérification que le rapport existe
+      - name: Debug - List jacoco files
+        run: ls -l target/site/jacoco || true
+
+      # Upload du fichier jacoco.xml pour SonarCloud
       - name: Upload back-end coverage
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: back/target/site/jacoco/jacoco.xml # <-- Pointage direct vers le XML
+          path: back/target/site/jacoco/jacoco.xml
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -47,11 +52,16 @@ jobs:
 
       - run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
 
+      # Vérification que le rapport existe
+      - name: Debug - List coverage files
+        run: ls -l coverage || true
+
+      # Upload du fichier lcov.info pour SonarCloud
       - name: Upload front-end coverage
         uses: actions/upload-artifact@v4
         with:
           name: angular-coverage
-          path: front/coverage/lcov.info # <-- Pointage direct vers le lcov
+          path: front/coverage/lcov.info
 
   sonar-backend:
     needs: backend-tests
@@ -65,11 +75,15 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
+      # Téléchargement du rapport de couverture
       - name: Download backend coverage
         uses: actions/download-artifact@v4
         with:
           name: jacoco-report
           path: cov-backend
+
+      - name: Debug - List downloaded backend coverage
+        run: ls -l cov-backend || true
 
       - name: Run SonarCloud analysis (Backend)
         uses: sonarsource/sonarcloud-github-action@v2
@@ -90,11 +104,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Téléchargement du rapport de couverture
       - name: Download frontend coverage
         uses: actions/download-artifact@v4
         with:
           name: angular-coverage
           path: cov-frontend
+
+      - name: Debug - List downloaded frontend coverage
+        run: ls -l cov-frontend || true
 
       - name: Run SonarCloud analysis (Frontend)
         uses: sonarsource/sonarcloud-github-action@v2
