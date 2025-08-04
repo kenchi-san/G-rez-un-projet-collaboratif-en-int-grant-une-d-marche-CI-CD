@@ -85,9 +85,9 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN_BACK }}
-            -Dsonar.sources=backend/src/main/java
-            -Dsonar.tests=backend/src/test/java
-            -Dsonar.java.binaries=backend/target/classes
+            -Dsonar.sources=back/src/main/java
+            -Dsonar.tests=back/src/test/java
+            -Dsonar.java.binaries=back/target/classes
             -Dsonar.coverage.jacoco.xmlReportPaths=cov-backend/jacoco.xml
 
   sonar-frontend:
@@ -110,7 +110,7 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN_FRONT }}
-            -Dsonar.sources=frontend/src/app
-            -Dsonar.tests=frontend/src
+            -Dsonar.sources=front/src/app
+            -Dsonar.tests=front/src
             -Dsonar.javascript.lcov.reportPaths=cov-frontend/lcov.info
             -Dsonar.exclusions=**/*.spec.ts
