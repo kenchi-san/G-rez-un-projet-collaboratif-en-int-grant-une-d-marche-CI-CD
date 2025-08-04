@@ -56,7 +56,7 @@ jobs:
       - name: Upload front-end coverage
         uses: actions/upload-artifact@v4
         with:
-          name: angular-coverage   # même nom ici
+          name: angular-coverage
           path: coverage/bobapp/lcov.info
 
   sonar-frontend:
@@ -68,8 +68,8 @@ jobs:
       - name: Download frontend coverage
         uses: actions/download-artifact@v4
         with:
-          name: angular-coverage    # même nom ici
-          path: cov-frontend        # dossier cible
+          name: angular-coverage
+          path: cov-frontend
 
       - name: Debug - List downloaded frontend coverage
         run: ls -lh cov-frontend || true
