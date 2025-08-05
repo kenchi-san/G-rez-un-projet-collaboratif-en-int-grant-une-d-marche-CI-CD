@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: back/target/site/jacoco/jacoco.xml  # ✅ chemin complet corrigé
+          path: back/target/site/jacoco/jacoco.xml
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: angular-coverage
-          path: front/coverage/bobapp/lcov.info  # ✅ chemin complet corrigé
+          path: front/coverage/bobapp/lcov.info
 
   sonar-frontend:
     needs: frontend-tests
@@ -81,12 +81,13 @@ jobs:
 
       - name: Run SonarCloud analysis (Frontend)
         uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
         with:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_FRONT }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.login=${{ secrets.SONAR_TOKEN_FRONT }}
             -Dsonar.sources=front/src/app
             -Dsonar.tests=front/src
             -Dsonar.javascript.lcov.reportPaths=front-coverage/lcov.info
@@ -114,12 +115,13 @@ jobs:
 
       - name: Run SonarCloud analysis (Backend)
         uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
         with:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACK }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.login=${{ secrets.SONAR_TOKEN_BACK }}
             -Dsonar.sources=back/src/main/java
             -Dsonar.tests=back/src/test/java
             -Dsonar.java.binaries=back/target/classes
