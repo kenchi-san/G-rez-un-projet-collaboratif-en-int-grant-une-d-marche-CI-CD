@@ -39,9 +39,6 @@ jobs:
 
   frontend-tests:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: front
     steps:
       - uses: actions/checkout@v4
 
@@ -50,23 +47,23 @@ jobs:
           node-version: 20
 
       - run: npm ci
-
       - run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
 
       - name: Debug - List coverage files
-        run: ls -lh coverage/bobapp || true
+        run: ls -lh front/coverage/bobapp || true
 
       - name: Check coverage file exists
-        run: test -f coverage/bobapp/lcov.info && echo "lcov.info found" || (echo "lcov.info missing" && exit 1)
+        run: test -f front/coverage/bobapp/lcov.info && echo "lcov.info found" || (echo "lcov.info missing" && exit 1)
 
       - name: Upload front-end coverage
         uses: actions/upload-artifact@v4
         with:
           name: angular-coverage
-          path: coverage/bobapp/lcov.info
+          path: front/coverage/bobapp/lcov.info
+
 
   sonar-frontend:
-    needs: frontend-tests     # <-- Ajout de cette ligne pour dépendance
+    needs: frontend-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -92,6 +89,7 @@ jobs:
             -Dsonar.tests=front/src
             -Dsonar.javascript.lcov.reportPaths=cov-frontend/lcov.info
             -Dsonar.exclusions=**/*.spec.ts
+  
 
   sonar-backend:
     needs: backend-tests
