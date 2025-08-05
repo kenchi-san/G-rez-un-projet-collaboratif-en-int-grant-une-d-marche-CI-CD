@@ -1,0 +1,128 @@
+name: CI Feature Branch
+
+on:
+  pull_request:
+    branches: ["mise_en_place_ci_cd"]
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - run: mvn clean verify jacoco:report
+
+      - name: Debug - List jacoco files
+        run: ls -lh target/site/jacoco || true
+
+      - name: Check jacoco.xml exists
+        run: test -f target/site/jacoco/jacoco.xml && echo "jacoco.xml found" || (echo "jacoco.xml missing" && exit 1)
+
+      - name: Upload back-end coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: back/target/site/jacoco/jacoco.xml
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+        working-directory: front
+
+      - run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+        working-directory: front
+
+      - name: Debug - List coverage files
+        run: ls -lh front/coverage/bobapp || true
+
+      - name: Check coverage file exists
+        run: test -f front/coverage/bobapp/lcov.info && echo "lcov.info found" || (echo "lcov.info missing" && exit 1)
+
+      - name: Upload front-end coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: angular-coverage
+          path: front/coverage/bobapp/lcov.info
+
+  sonar-frontend:
+    needs: frontend-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download frontend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: angular-coverage
+          path: front-coverage
+
+      - name: Debug - List downloaded frontend coverage
+        run: ls -lh front-coverage || true
+
+      - name: Run SonarCloud analysis (Frontend)
+        uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_FRONT }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.sources=front/src/app
+            -Dsonar.tests=front/src
+            -Dsonar.javascript.lcov.reportPaths=front-coverage/lcov.info
+            -Dsonar.exclusions=**/*.spec.ts
+
+  sonar-backend:
+    needs: backend-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Download backend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: jacoco-report
+          path: backend-coverage
+
+      - name: Debug - List downloaded backend coverage
+        run: ls -lh backend-coverage || true
+
+      - name: Run SonarCloud analysis (Backend)
+        uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACK }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.sources=back/src/main/java
+            -Dsonar.tests=back/src/test/java
+            -Dsonar.java.binaries=back/target/classes
+            -Dsonar.coverage.jacoco.xmlReportPaths=backend-coverage/jacoco.xml
