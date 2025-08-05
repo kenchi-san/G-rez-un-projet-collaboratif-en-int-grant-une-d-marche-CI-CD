@@ -43,7 +43,7 @@ jobs:
 
       - name: Build and test backend with coverage
         run: |
-          cd backend
+          cd back
           mvn clean verify jacoco:report
 
       - name: Analyze backend with SonarQube
@@ -55,10 +55,10 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACK }}
-            -Dsonar.sources=backend/src/main/java
-            -Dsonar.tests=backend/src/test/java
-            -Dsonar.java.binaries=backend/target/classes
-            -Dsonar.coverage.jacoco.xmlReportPaths=backend/target/site/jacoco/jacoco.xml
+            -Dsonar.sources=back/src/main/java
+            -Dsonar.tests=back/src/test/java
+            -Dsonar.java.binaries=back/target/classes
+            -Dsonar.coverage.jacoco.xmlReportPaths=back/target/site/jacoco/jacoco.xml
             -Dsonar.exclusions=**/*.spec.ts
 
   sonar-frontend:
@@ -74,7 +74,7 @@ jobs:
 
       - name: Install dependencies and run frontend tests with coverage
         run: |
-          cd frontend
+          cd front
           npm ci
           npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
 
@@ -87,7 +87,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_FRONT }}
-            -Dsonar.sources=frontend/src/app
-            -Dsonar.tests=frontend/src
-            -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info
+            -Dsonar.sources=front/src/app
+            -Dsonar.tests=front/src
+            -Dsonar.javascript.lcov.reportPaths=front/coverage/lcov.info
             -Dsonar.exclusions=**/*.spec.ts
