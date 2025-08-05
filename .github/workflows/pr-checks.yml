@@ -39,6 +39,9 @@ jobs:
 
   frontend-tests:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
     steps:
       - uses: actions/checkout@v4
 
@@ -47,10 +50,11 @@ jobs:
           node-version: 20
 
       - run: npm ci
+
       - run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
 
       - name: Debug - List coverage files
-        run: ls -lh front/coverage/bobapp || true
+        run: ls -lh coverage/bobapp || true
 
       - name: Check coverage file exists
         run: test -f front/coverage/bobapp/lcov.info && echo "lcov.info found" || (echo "lcov.info missing" && exit 1)
