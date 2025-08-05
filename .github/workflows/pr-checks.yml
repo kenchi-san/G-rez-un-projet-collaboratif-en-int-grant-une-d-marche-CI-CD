@@ -35,13 +35,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: target/site/jacoco/jacoco.xml
+          path: back/target/site/jacoco/jacoco.xml
 
   frontend-tests:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: front
     steps:
       - uses: actions/checkout@v4
 
@@ -50,11 +47,13 @@ jobs:
           node-version: 20
 
       - run: npm ci
+        working-directory: front
 
       - run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+        working-directory: front
 
       - name: Debug - List coverage files
-        run: ls -lh coverage/bobapp || true
+        run: ls -lh front/coverage/bobapp || true
 
       - name: Check coverage file exists
         run: test -f front/coverage/bobapp/lcov.info && echo "lcov.info found" || (echo "lcov.info missing" && exit 1)
@@ -64,7 +63,6 @@ jobs:
         with:
           name: angular-coverage
           path: front/coverage/bobapp/lcov.info
-
 
   sonar-frontend:
     needs: frontend-tests
@@ -76,10 +74,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: angular-coverage
-          path: cov-frontend
+          path: front-coverage
 
       - name: Debug - List downloaded frontend coverage
-        run: ls -lh cov-frontend || true
+        run: ls -lh front-coverage || true
 
       - name: Run SonarCloud analysis (Frontend)
         uses: sonarsource/sonarcloud-github-action@v2
@@ -91,9 +89,8 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_TOKEN_FRONT }}
             -Dsonar.sources=front/src/app
             -Dsonar.tests=front/src
-            -Dsonar.javascript.lcov.reportPaths=cov-frontend/lcov.info
+            -Dsonar.javascript.lcov.reportPaths=front-coverage/lcov.info
             -Dsonar.exclusions=**/*.spec.ts
-  
 
   sonar-backend:
     needs: backend-tests
@@ -110,10 +107,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: jacoco-report
-          path: cov-backend
+          path: backend-coverage
 
       - name: Debug - List downloaded backend coverage
-        run: ls -lh cov-backend || true
+        run: ls -lh backend-coverage || true
 
       - name: Run SonarCloud analysis (Backend)
         uses: sonarsource/sonarcloud-github-action@v2
@@ -126,4 +123,4 @@ jobs:
             -Dsonar.sources=back/src/main/java
             -Dsonar.tests=back/src/test/java
             -Dsonar.java.binaries=back/target/classes
-            -Dsonar.coverage.jacoco.xmlReportPaths=cov-backend/jacoco.xml
+            -Dsonar.coverage.jacoco.xmlReportPaths=backend-coverage/jacoco.xml
