@@ -25,7 +25,7 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_TOKEN_BACK }}
 
       - name: Wait for Quality Gate (Backend)
-        uses: sonarsource/sonarcloud-quality-gate-action@v1
+        uses: SonarSource/sonarcloud-quality-gate-action@master
         with:
           projectKey: ${{ secrets.SONAR_PROJECT_KEY_BACK }}
           sonarToken: ${{ secrets.SONAR_TOKEN_BACK }}
@@ -46,7 +46,7 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_TOKEN_FRONT }}
 
       - name: Wait for Quality Gate (Frontend)
-        uses: sonarsource/sonarcloud-quality-gate-action@v1
+        uses: SonarSource/sonarcloud-quality-gate-action@master
         with:
           projectKey: ${{ secrets.SONAR_PROJECT_KEY_FRONT }}
           sonarToken: ${{ secrets.SONAR_TOKEN_FRONT }}
