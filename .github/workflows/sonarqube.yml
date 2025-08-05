@@ -1,4 +1,4 @@
-name: SonarCloud Analysis Split (Backend & Frontend)
+name: CI - SonarCloud Analysis Split (Backend & Frontend)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write  # nécessaire pour PR decoration
+  pull-requests: write
 
 jobs:
   backend-tests:
@@ -26,6 +26,12 @@ jobs:
           java-version: 17
 
       - run: mvn clean verify jacoco:report
+
+      - name: Debug - List jacoco files
+        run: ls -lh target/site/jacoco || true
+
+      - name: Check jacoco.xml exists
+        run: test -f target/site/jacoco/jacoco.xml && echo "jacoco.xml found" || (echo "jacoco.xml missing" && exit 1)
 
       - name: Upload backend coverage report
         uses: actions/upload-artifact@v4
@@ -48,11 +54,17 @@ jobs:
       - run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
         working-directory: front
 
+      - name: Debug - List coverage files
+        run: ls -lh front/coverage/bobapp || true
+
+      - name: Check coverage file exists
+        run: test -f front/coverage/bobapp/lcov.info && echo "lcov.info found" || (echo "lcov.info missing" && exit 1)
+
       - name: Upload frontend coverage report
         uses: actions/upload-artifact@v4
         with:
           name: angular-coverage
-          path: front/coverage/lcov.info
+          path: front/coverage/bobapp/lcov.info
 
   sonar-backend:
     needs: backend-tests
@@ -71,18 +83,21 @@ jobs:
           name: jacoco-report
           path: backend-coverage
 
+      - name: Debug - List downloaded backend coverage
+        run: ls -lh backend-coverage || true
+
       - name: Run SonarCloud analysis (Backend)
-        uses: SonarSource/sonarqube-scan-action@v2.0.2
+        uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
         with:
-          hostUrl: ${{ secrets.SONAR_HOST_URL }}
-          token: ${{ secrets.SONAR_TOKEN_BACK }}
-          projectBaseDir: back
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACK }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
-            -Dsonar.sources=src/main/java
-            -Dsonar.tests=src/test/java
-            -Dsonar.java.binaries=target/classes
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.sources=back/src/main/java
+            -Dsonar.tests=back/src/test/java
+            -Dsonar.java.binaries=back/target/classes
             -Dsonar.coverage.jacoco.xmlReportPaths=backend-coverage/jacoco.xml
 
   sonar-frontend:
@@ -101,15 +116,19 @@ jobs:
           name: angular-coverage
           path: front-coverage
 
+      - name: Debug - List downloaded frontend coverage
+        run: ls -lh front-coverage || true
+
       - name: Run SonarCloud analysis (Frontend)
-        uses: SonarSource/sonarqube-scan-action@v2.0.2
+        uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
         with:
-          hostUrl: ${{ secrets.SONAR_HOST_URL }}
-          token: ${{ secrets.SONAR_TOKEN_FRONT }}
-          projectBaseDir: front
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_FRONT }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
-            -Dsonar.sources=src/app
-            -Dsonar.tests=src
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.sources=front/src/app
+            -Dsonar.tests=front/src
             -Dsonar.javascript.lcov.reportPaths=front-coverage/lcov.info
+            -Dsonar.exclusions=**/*.spec.ts
