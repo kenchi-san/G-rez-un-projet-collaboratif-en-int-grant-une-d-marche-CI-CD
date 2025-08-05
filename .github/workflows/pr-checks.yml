@@ -1,7 +1,7 @@
 name: CI Feature Branch
 
 on:
-  pull_request:
+  push:
     branches: ["mise_en_place_ci_cd"]
 
 permissions:
