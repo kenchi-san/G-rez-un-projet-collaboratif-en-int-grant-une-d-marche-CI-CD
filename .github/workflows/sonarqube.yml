@@ -2,9 +2,9 @@ name: CI - SonarCloud Analysis Split (Backend & Frontend)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -81,10 +81,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: jacoco-report
-          path: backend-coverage
+          path: back/target/site/jacoco
 
-      - name: Debug - List downloaded backend coverage
-        run: ls -lh backend-coverage || true
+      - name: Debug - Confirm jacoco.xml location
+        run: ls -lh back/target/site/jacoco || true
 
       - name: Run SonarCloud analysis (Backend)
         uses: sonarsource/sonarcloud-github-action@v2
@@ -98,7 +98,7 @@ jobs:
             -Dsonar.sources=back/src/main/java
             -Dsonar.tests=back/src/test/java
             -Dsonar.java.binaries=back/target/classes
-            -Dsonar.coverage.jacoco.xmlReportPaths=backend-coverage/jacoco.xml
+            -Dsonar.coverage.jacoco.xmlReportPaths=back/target/site/jacoco/jacoco.xml
 
   sonar-frontend:
     needs: frontend-tests
@@ -114,10 +114,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: angular-coverage
-          path: front-coverage
+          path: front/coverage/bobapp
 
-      - name: Debug - List downloaded frontend coverage
-        run: ls -lh front-coverage || true
+      - name: Debug - Confirm lcov.info location
+        run: ls -lh front/coverage/bobapp || true
 
       - name: Run SonarCloud analysis (Frontend)
         uses: sonarsource/sonarcloud-github-action@v2
@@ -130,5 +130,5 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=front/src/app
             -Dsonar.tests=front/src
-            -Dsonar.javascript.lcov.reportPaths=front-coverage/lcov.info
+            -Dsonar.javascript.lcov.reportPaths=front/coverage/bobapp/lcov.info
             -Dsonar.exclusions=**/*.spec.ts
