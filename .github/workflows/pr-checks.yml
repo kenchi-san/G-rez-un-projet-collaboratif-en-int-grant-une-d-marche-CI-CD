@@ -3,6 +3,8 @@ name: CI Feature Branch
 on:
   push:
     branches: ["mise_en_place_ci_cd"]
+  pull_request:
+    branches: ["mise_en_place_ci_cd"]
 
 permissions:
   checks: write
@@ -92,6 +94,9 @@ jobs:
             -Dsonar.tests=front/src
             -Dsonar.javascript.lcov.reportPaths=front/coverage/bobapp/lcov.info
             -Dsonar.exclusions=**/*.spec.ts
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+            -Dsonar.pullrequest.branch=${{ github.head_ref }}
+            -Dsonar.pullrequest.base=${{ github.base_ref }}
 
   sonar-backend:
     needs: backend-tests
@@ -126,3 +131,6 @@ jobs:
             -Dsonar.tests=back/src/test/java
             -Dsonar.java.binaries=back/target/classes
             -Dsonar.coverage.jacoco.xmlReportPaths=back/target/site/jacoco/jacoco.xml
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+            -Dsonar.pullrequest.branch=${{ github.head_ref }}
+            -Dsonar.pullrequest.base=${{ github.base_ref }}
