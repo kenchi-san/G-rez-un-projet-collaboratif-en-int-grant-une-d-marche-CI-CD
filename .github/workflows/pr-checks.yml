@@ -4,7 +4,7 @@ on:
   push:
     branches: ["mise_en_place_ci_cd"]
   pull_request:
-    branches: ["mise_en_place_ci_cd"]
+    branches: ["main"]
 
 permissions:
   checks: write
