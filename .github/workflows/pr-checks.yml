@@ -4,7 +4,7 @@ on:
   push:
     branches: ["mise_en_place_ci_cd"]
   pull_request:
-    branches: ["mise_en_place_ci_cd"]
+    branches: ["main"]
 
 permissions:
   checks: write
@@ -94,9 +94,8 @@ jobs:
             -Dsonar.tests=front/src
             -Dsonar.javascript.lcov.reportPaths=front/coverage/bobapp/lcov.info
             -Dsonar.exclusions=**/*.spec.ts
-            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
-            -Dsonar.pullrequest.branch=${{ github.head_ref }}
-            -Dsonar.pullrequest.base=${{ github.base_ref }}
+            ${{ github.event_name == 'pull_request' && format('-Dsonar.pullrequest.key={0} -Dsonar.pullrequest.branch={1} -Dsonar.pullrequest.base={2}', github.event.pull_request.number, github.head_ref, github.base_ref) || '' }}
+  
 
   sonar-backend:
     needs: backend-tests
@@ -131,6 +130,5 @@ jobs:
             -Dsonar.tests=back/src/test/java
             -Dsonar.java.binaries=back/target/classes
             -Dsonar.coverage.jacoco.xmlReportPaths=back/target/site/jacoco/jacoco.xml
-            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
-            -Dsonar.pullrequest.branch=${{ github.head_ref }}
-            -Dsonar.pullrequest.base=${{ github.base_ref }}
+            ${{ github.event_name == 'pull_request' && format('-Dsonar.pullrequest.key={0} -Dsonar.pullrequest.branch={1} -Dsonar.pullrequest.base={2}', github.event.pull_request.number, github.head_ref, github.base_ref) || '' }}
+          
