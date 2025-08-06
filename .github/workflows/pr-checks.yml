@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: target/site/jacoco/jacoco.xml  # Chemin relatif à back
+          path: back/target/site/jacoco/jacoco.xml   #
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: angular-coverage
-          path: front/coverage/bobapp/lcov.info  # Chemin complet relatif à la racine
+          path: front/coverage/bobapp/lcov.info
 
   sonar-backend:
     needs: backend-tests
@@ -69,7 +69,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: jacoco-report
-          path: back/target/site/jacoco  # Chemin complet pour download
+          path: back/target/site/jacoco
 
       - name: Run SonarCloud analysis (Backend)
         uses: sonarsource/sonarcloud-github-action@v2
@@ -100,7 +100,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: angular-coverage
-          path: front/coverage/bobapp  # Chemin complet pour download
+          path: front/coverage/bobapp
 
       - name: Run SonarCloud analysis (Frontend)
         uses: sonarsource/sonarcloud-github-action@v2
