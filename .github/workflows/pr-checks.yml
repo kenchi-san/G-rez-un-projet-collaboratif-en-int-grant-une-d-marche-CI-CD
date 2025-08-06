@@ -25,7 +25,8 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - run: mvn clean verify jacoco:report
+      - name: Build, test and generate coverage report
+        run: mvn clean verify jacoco:report
 
       - name: Upload backend coverage report
         uses: actions/upload-artifact@v4
@@ -42,10 +43,12 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
         working-directory: front
 
-      - run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+      - name: Run frontend tests with coverage
+        run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
         working-directory: front
 
       - name: Upload frontend coverage report
@@ -57,6 +60,9 @@ jobs:
   sonar-backend:
     needs: backend-tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
     steps:
       - uses: actions/checkout@v4
 
@@ -69,14 +75,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: jacoco-report
-          path: back/target/site/jacoco  # ✅ OK
+          path: target/site/jacoco
 
       - name: Run SonarCloud analysis (Backend)
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
         with:
-          projectBaseDir: back
+          projectBaseDir: .
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACK }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
