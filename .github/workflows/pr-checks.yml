@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: target/site/jacoco/jacoco.xml
+          path: back/target/site/jacoco/jacoco.xml
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -80,7 +80,6 @@ jobs:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACK }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
-            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=src/main/java
             -Dsonar.tests=src/test/java
             -Dsonar.java.binaries=target/classes
@@ -112,7 +111,6 @@ jobs:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_FRONT }}
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
-            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=src/app
             -Dsonar.tests=src
             -Dsonar.javascript.lcov.reportPaths=coverage/bobapp/lcov.info
