@@ -2,28 +2,33 @@ name: Release Pipeline
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  wait-quality-gates:
+  wait-quality-gates-backend:
     runs-on: ubuntu-latest
     steps:
-      - uses: SonarSource/sonarcloud-quality-gate-action@master
+      - name: Wait for SonarCloud Quality Gate (Backend)
+        uses: SonarSource/sonarcloud-quality-gate-action@master
         with:
           projectKey: ${{ secrets.SONAR_PROJECT_KEY_BACK }}
           sonarToken: ${{ secrets.SONAR_TOKEN_BACK }}
 
-      - uses: SonarSource/sonarcloud-quality-gate-action@master
+  wait-quality-gates-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for SonarCloud Quality Gate (Frontend)
+        uses: SonarSource/sonarcloud-quality-gate-action@master
         with:
           projectKey: ${{ secrets.SONAR_PROJECT_KEY_FRONT }}
           sonarToken: ${{ secrets.SONAR_TOKEN_FRONT }}
 
   build-and-push:
-    needs: wait-quality-gates
+    needs: [wait-quality-gates-backend, wait-quality-gates-frontend]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
