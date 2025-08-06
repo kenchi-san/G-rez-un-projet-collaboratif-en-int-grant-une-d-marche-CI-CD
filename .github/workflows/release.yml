@@ -9,50 +9,21 @@ permissions:
   packages: write
 
 jobs:
-  quality-gate-backend:
+  wait-quality-gates:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: sonarsource/sonarcloud-github-action@v2
-        with:
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACK }}
-            -Dsonar.organization=${{ secrets.SONAR_ORG }}
-            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
-            -Dsonar.login=${{ secrets.SONAR_TOKEN_BACK }}
-
-      - name: Wait for Quality Gate (Backend)
-        uses: SonarSource/sonarcloud-quality-gate-action@master
+      - uses: SonarSource/sonarcloud-quality-gate-action@master
         with:
           projectKey: ${{ secrets.SONAR_PROJECT_KEY_BACK }}
           sonarToken: ${{ secrets.SONAR_TOKEN_BACK }}
 
-  quality-gate-frontend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: sonarsource/sonarcloud-github-action@v2
-        with:
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_FRONT }}
-            -Dsonar.organization=${{ secrets.SONAR_ORG }}
-            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
-            -Dsonar.login=${{ secrets.SONAR_TOKEN_FRONT }}
-
-      - name: Wait for Quality Gate (Frontend)
-        uses: SonarSource/sonarcloud-quality-gate-action@master
+      - uses: SonarSource/sonarcloud-quality-gate-action@master
         with:
           projectKey: ${{ secrets.SONAR_PROJECT_KEY_FRONT }}
           sonarToken: ${{ secrets.SONAR_TOKEN_FRONT }}
 
   build-and-push:
-    needs: [quality-gate-backend, quality-gate-frontend]
+    needs: wait-quality-gates
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
