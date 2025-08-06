@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: back/target/site/jacoco/jacoco.xml   #
+          path: target/site/jacoco/jacoco.xml  # ✅ Corrigé : sans 'back/' car working-directory est déjà 'back'
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -69,7 +69,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: jacoco-report
-          path: back/target/site/jacoco
+          path: back/target/site/jacoco  # ✅ OK
 
       - name: Run SonarCloud analysis (Backend)
         uses: sonarsource/sonarcloud-github-action@v2
