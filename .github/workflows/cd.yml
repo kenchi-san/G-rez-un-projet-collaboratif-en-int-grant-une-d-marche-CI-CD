@@ -19,10 +19,10 @@ jobs:
       # Backend
       - name: Build & Push Backend
         run: |
-          docker build -t kenchisan/monapp-back:${{ github.ref_name }} backend
+          docker build -t kenchisan/monapp-back:${{ github.ref_name }} back
           docker push kenchisan/monapp-back:${{ github.ref_name }}
       # Frontend
       - name: Build & Push Frontend
         run: |
-          docker build -t kenchisan/monapp-front:${{ github.ref_name }} frontend
+          docker build -t kenchisan/monapp-front:${{ github.ref_name }} front
           docker push kenchisan/monapp-front:${{ github.ref_name }}
